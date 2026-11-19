@@ -1,0 +1,68 @@
+name: Vulnerability 2 - DEBUG mode check
+
+# Builds PyGoat from this repository and compares the app with debug mode
+# on (state before the patch) and off (state after the patch).
+on:
+  push:
+    branches: [vuln2-debug-mode]
+  workflow_dispatch:
+
+jobs:
+  debug_check:
+    name: Before/after check of DEBUG mode
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image from the repository
+        run: docker build -f Dockerfile -t pygoat-local:latest .
+
+      - name: Prepare report directory
+        run: |
+          mkdir -p reports
+          chmod 777 reports
+
+      - name: Run checks (before = DJANGO_DEBUG=True, after = default)
+        run: |
+          for MODE in before after; do
+            if [ "$MODE" = "before" ]; then DBG="True"; else DBG="False"; fi
+
+            docker run --rm -d --name pygoat -p 8000:8000 \
+              -e DJANGO_SECRET_KEY=ci-test-key-only \
+              -e DJANGO_DEBUG=$DBG \
+              pygoat-local:latest \
+              sh -c "python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 pygoat.wsgi"
+
+            for i in $(seq 1 60); do
+              curl -s -o /dev/null http://127.0.0.1:8000/login/ && break
+              sleep 2
+            done
+
+            echo "## $MODE the patch (DJANGO_DEBUG=$DBG)" >> $GITHUB_STEP_SUMMARY
+            echo "| URL | HTTP code | Debug page? | Python traceback? |" >> $GITHUB_STEP_SUMMARY
+            echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
+            for URL in /this-page-does-not-exist/ /accounts/password/reset/ /accounts/google/login/; do
+              CODE=$(curl -s -o reports/$MODE-page.html -w "%{http_code}" "http://127.0.0.1:8000$URL")
+              if grep -q "DEBUG = True" reports/$MODE-page.html; then DP="yes"; else DP="no"; fi
+              if grep -q -i "traceback" reports/$MODE-page.html; then TB="yes"; else TB="no"; fi
+              echo "| $URL | $CODE | $DP | $TB |" >> $GITHUB_STEP_SUMMARY
+              cp reports/$MODE-page.html "reports/$MODE$(echo $URL | tr '/' '_').html"
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            docker run --network host -v "$PWD/reports:/zap/wrk/:rw" \
+              ghcr.io/zaproxy/zaproxy:stable \
+              zap-baseline.py -t http://127.0.0.1:8000 -r zap-$MODE.html -I || true
+
+            docker stop pygoat
+            sleep 3
+          done
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vuln2-debug-reports
+          path: reports/

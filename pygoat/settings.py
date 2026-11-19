@@ -27,7 +27,9 @@ if not SECRET_KEY:
 SENSITIVE_DATA = os.environ.get("SENSITIVE_DATA", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Debug mode is off by default. It can be turned on only for local
+# development with the environment variable DJANGO_DEBUG=True.
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = ["pygoat.herokuapp.com", "0.0.0.0", "127.0.0.1", "localhost", "lvh.me", ".lvh.me", "web"]
 
