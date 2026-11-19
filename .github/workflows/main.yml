@@ -26,21 +26,28 @@ jobs:
           echo "PyGoat failed to start"
           exit 1
 
+      - name: Prepare report directory
+        run: |
+          mkdir -p zap-output
+          chmod 777 zap-output
+
       - name: Run OWASP ZAP Baseline Scan
         run: |
           docker run --network host \
-            -v "$PWD:/zap/wrk/:rw" \
+            -v "$PWD/zap-output:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
             -t http://127.0.0.1:8000 \
-            -r zap-report.html
+            -r zap-report.html \
+            -I
 
       - name: Upload DAST Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: zap-dast-report
-          path: zap-report.html
+          path: zap-output/zap-report.html
+          if-no-files-found: warn
 
   sast_scan:
     name: Run Bandit Scan
