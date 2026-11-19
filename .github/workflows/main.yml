@@ -1,10 +1,9 @@
-
 name: CI
 
 on: [push]
 
 jobs:
-    dast_scan:
+  dast_scan:
     name: Deploy PyGoat and Run DAST
     runs-on: ubuntu-latest
 
@@ -54,7 +53,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Bandit
         run: pip install bandit
