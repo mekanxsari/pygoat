@@ -4,6 +4,45 @@ name: CI
 on: [push]
 
 jobs:
+    dast_scan:
+    name: Deploy PyGoat and Run DAST
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy PyGoat
+        run: |
+          docker pull pygoat/pygoat:latest
+          docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
+
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/ > /dev/null; then
+              echo "PyGoat is ready!"
+              exit 0
+            fi
+            echo "Waiting for PyGoat..."
+            sleep 2
+          done
+          echo "PyGoat failed to start"
+          exit 1
+
+      - name: Run OWASP ZAP Baseline Scan
+        run: |
+          docker run --network host \
+            -v "$PWD:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+            -t http://127.0.0.1:8000 \
+            -r zap-report.html
+
+      - name: Upload DAST Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-dast-report
+          path: zap-report.html
+
   sast_scan:
     name: Run Bandit Scan
     runs-on: ubuntu-latest
