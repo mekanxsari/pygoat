@@ -30,6 +30,9 @@ function swapStyleSheet() {
 
 $(document).ready(function () {
   var elem3 = document.getElementById('stylesheet-toggle');
+  if (elem3) {
+    elem3.addEventListener('click', swapStyleSheet);
+  }
   if (elem3 && localStorage.getItem('theme') === 'light') {
     elem3.classList.remove('dark');
     elem3.classList.add('light');

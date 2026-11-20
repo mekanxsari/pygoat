@@ -1,11 +1,10 @@
 {% load static %}
 <!-- Sidebar  -->
-<nav id="sidebar" style="overflow: scroll" class="sidebarClass">
+<nav id="sidebar" class="sidebarClass csp-sidebar-scroll">
   <div class="sidebar-header">
     <div
       id="pygoat"
-      style="display: flex; flex-direction: row; align-items: center"
-    >
+     class="csp-sidebar-brand">
       <img
         src="{% static 'Lab/icons/pygoat-mini.svg' %}"
         alt="logo"
@@ -17,15 +16,14 @@
     <strong>PG</strong>
   </div>
 
-  <ul class="list-unstyled components" style="margin-bottom: 0px;">
+  <ul class="list-unstyled components csp-sidebar-list">
     <li >
       <a
         href="#homeSubmenu"
         data-toggle="collapse"
         aria-expanded="false"
-        class="dropdown-toggle"
+        class="dropdown-toggle csp-sidebar-link"
         id="sidebar-home"
-        style="padding: 13% 0 0 0"
       >
         <i class="fas fa-flag"></i>
         Home
@@ -42,9 +40,8 @@
         href="#{{ category.collapse_id }}"
         data-toggle="collapse"
         aria-expanded="false"
-        class="dropdown-toggle"
+        class="dropdown-toggle {% if category.key != 'challenges' %}csp-category-padded{% else %}csp-sidebar-link{% endif %}"
         id="{{ category.menu_id }}"
-        style="padding: 13% {% if category.key != 'challenges' %}10%{% else %}0{% endif %} 0 0"
       >
         <i class="fas fa-flag"></i>
         {{ category.label }}
@@ -71,7 +68,7 @@
             </li>
             {% endif %}
             <li>
-              <button onclick="launchLab('{{ lab.lab_name }}')" class="sidebar-list-items lab-button" data-lab="{{ lab.lab_name }}">
+              <button class="sidebar-list-items lab-button" data-lab="{{ lab.lab_name }}">
                 <i class="fas fa-bug"></i>
                 {{ lab.display_name }}
                 {% if lab.difficulty %}<span class="badge badge-secondary ml-1" title="Score multiplier x{{ lab.difficulty.multiplier }}">{{ lab.difficulty.name }}</span>{% endif %}
@@ -84,7 +81,7 @@
         {% endfor %}
         {% for lab in category.labs %}
         <li>
-          <button onclick="launchLab('{{ lab.lab_name }}')" class="sidebar-list-items lab-button" data-lab="{{ lab.lab_name }}">
+          <button class="sidebar-list-items lab-button" data-lab="{{ lab.lab_name }}">
             <i class="fas fa-bug"></i>
             {{ lab.display_name }}
             {% if lab.difficulty %}<span class="badge badge-secondary ml-1" title="Score multiplier x{{ lab.difficulty.multiplier }}">{{ lab.difficulty.name }}</span>{% endif %}
@@ -99,9 +96,8 @@
         href="#customLabsSubmenu"
         data-toggle="collapse"
         aria-expanded="false"
-        class="dropdown-toggle"
+        class="dropdown-toggle csp-sidebar-link"
         id="customLabsMenu"
-        style="padding: 13% 0 0 0"
       >
         <i class="fas fa-cog"></i>
         Custom Labs
@@ -115,9 +111,8 @@
         href="#"
         data-toggle="collapse"
         aria-expanded="false"
-        class="dropdown-toggle"
+        class="dropdown-toggle csp-sidebar-link"
         id="help"
-        style="padding: 13% 0 0 0"
       >
         <i class="fas fa-question"></i>
         Help

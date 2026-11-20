@@ -20,26 +20,26 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="nav navbar-nav ml-auto">
         <li class="nav-item">
-          <button class="nav-link dark" href='{% url "logout" %}?next=/' id="stylesheet-toggle" onclick="swapStyleSheet()"
+          <button class="nav-link dark" href='{% url "logout" %}?next=/' id="stylesheet-toggle"
             >Theme</button
           >
         </li>
 
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link dark mr-2" href="{% url 'scoring:dashboard' %}" id="user-score-btn" style="background: #f0f8ff8a; border-radius: 2px; border: none;">
+          <a class="nav-link dark mr-2 csp-navbar-action" href="{% url 'scoring:dashboard' %}" id="user-score-btn">
             Score: {{ user_total_score|default:"0" }} pts
           </a>
         </li>
         {% if user.is_staff %}
         <li class="nav-item">
-          <button class="nav-link dark mr-2" onclick="openCustomLabsModal()" id="custom-labs-btn" style="background: #f0f8ff8a; border-radius: 2px; border: none;">
+          <button class="nav-link dark mr-2 csp-navbar-action" id="custom-labs-btn">
             Custom Labs
           </button>
         </li>
         {% endif %}
         <li class="nav-item">
-          <button class="nav-link dark" onclick="manageLabs()" id="manage-labs-btn" style="background: #f0f8ff8a; border-radius: 2px; border: none;">
+          <button class="nav-link dark csp-navbar-action" id="manage-labs-btn">
             Manage Labs
           </button>
         </li>

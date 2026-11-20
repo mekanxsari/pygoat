@@ -19,14 +19,10 @@
     />
     <!-- Our Custom CSS -->
     <link id="pagestyle" rel="stylesheet" href="{% static 'css/dark-theme.css'%}" />
-    <script>
-      if (localStorage.getItem('theme') === 'light') {
-        document.getElementById('pagestyle').setAttribute('href', '/static/css/light.css');
-      }
-    </script>
     <link rel="stylesheet" href="{% static 'css/home.css'%}" />
     <link rel="stylesheet" href="{% static 'Lab/ssrf.css'%}" />
     <link rel="stylesheet" href="{% static 'css/supply_chain.css'%}" />
+    <link rel="stylesheet" href="{% static 'css/csp-layout.css'%}" />
     <link rel="icon" href="{% static 'Lab/icons/pygoat-mini.png' %}" />
     <!-- Font Awesome JS -->
     <script
@@ -43,14 +39,14 @@
     ></script>
   </head>
 
-  <body>
+  <body data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
     <div class="wrapper">
       <div class="pg active">PG</div>
       <!-- Sidebar -->
       {% include "introduction/includes/_sidebar.html" %}
 
       <!-- Page Content -->
-      <div id="content" style="height: 97vh; overflow-y: auto;">
+      <div id="content" class="csp-page-content">
         {% include "introduction/includes/_navbar.html" %}
         {% include "introduction/includes/_messages.html" %}
 
@@ -82,9 +78,6 @@
 
     <!-- Application Custom JavaScript -->
     <script src="{% static 'js/theme.js' %}"></script>
-    <script>
-      const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
-    </script>
     <script src="{% static 'js/lab_manager.js' %}"></script>
   </body>
 </html>

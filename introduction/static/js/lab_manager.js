@@ -1,3 +1,17 @@
+const isAuthenticated = document.body.dataset.authenticated === 'true';
+
+document.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-launch-lab], .lab-button[data-lab]');
+  if (button) {
+    launchLab(button.dataset.launchLab || button.dataset.lab);
+    return;
+  }
+  if (event.target.closest('#custom-labs-btn')) openCustomLabsModal();
+  if (event.target.closest('#manage-labs-btn')) manageLabs();
+  if (event.target.closest('#custom-lab-cancel-btn')) resetCustomLabForm();
+  if (event.target.closest('[data-go-home]')) window.location.href = '/';
+});
+
 function setLabIndicatorState(button, isRunning) {
   const indicator = button.querySelector('.lab-status-indicator');
   if (!indicator) return;

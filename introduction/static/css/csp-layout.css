@@ -1,0 +1,33 @@
+/* Layout moved from inline attributes so the portal works under CSP. */
+.csp-flex-wrap { display: flex; flex-direction: row; flex-wrap: wrap; }
+.csp-register-card { width: 35rem; margin: 10px; }
+.csp-dark-text { color: #26282b; }
+.csp-login-link { color: #027bff; }
+.csp-login-card { width: 30rem; margin: 10px; }
+.csp-login-heading { margin: 20px; color: #26282b; }
+.csp-login-submit { margin: 10px; }
+.csp-auth-actions { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+.csp-auth-button { margin-left: 7px; background: #2aa2b8; }
+.csp-page-content { height: 97vh; overflow-y: auto; }
+.csp-navbar-action { background: #f0f8ff8a; border-radius: 2px; border: none; }
+.csp-sidebar-scroll { overflow: scroll; }
+.csp-sidebar-brand { display: flex; flex-direction: row; align-items: center; }
+.csp-sidebar-list { margin-bottom: 0; }
+.csp-sidebar-link { padding: 13% 0 0 0; }
+.csp-hidden { display: none; }
+.csp-modal-info { background: #a9cfed2b; color: inherit; }
+.csp-inherit-color { color: inherit; }
+.csp-lab-gap { margin-top: 15px; }
+.csp-lab-gap-left { margin-top: 15px; margin-left: 15px; }
+.csp-text-center { text-align: center; }
+.csp-mitigation-list { color: #111; list-style: circle inside; }
+.csp-category-padded { padding: 13% 10% 0 0; }
+.csp-challenge-flag { max-width: 480px; }
+.csp-scoreboard { padding-bottom: 50px; }
+.csp-milestone { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; }
+.csp-milestone-earned { border-color: #28a745; }
+.csp-milestone-title { font-size: 1.05em; }
+.csp-milestone-description { font-size: 0.9em; flex-grow: 1; }
+.csp-milestone-progress-label { font-size: 0.85em; opacity: 0.85; }
+.csp-score-progress { display: block; width: 100%; height: 6px; }
+.csp-milestone-earned-date { font-size: 0.8em; opacity: 0.75; }

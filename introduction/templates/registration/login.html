@@ -2,10 +2,10 @@
 {% block content %}
 {% load crispy_forms_tags %}
 {% load socialaccount %}
-<div style="display: flex; flex-direction: row; flex-wrap: wrap">
- <div class="card mx-auto" style="width: 30rem;margin: 10px">
+<div class="csp-flex-wrap">
+ <div class="card mx-auto csp-login-card">
 <div class="conatiner border border-info rounded">
-    <h2 align="center" style="margin:20px; color: #26282b">Login</h2>
+    <h2 align="center" class="csp-login-heading">Login</h2>
     
     <form method="post">
         <div class="login-form">
@@ -16,16 +16,16 @@
          </p>
         </div>
         <div class="text-center">
-        <button type="submit" class="btn btn-info" style="margin:10px">Login</button>
+        <button type="submit" class="btn btn-info csp-login-submit">Login</button>
         </div>
     </form>
-    <div style="display:flex;justify-content: center;align-items: center; margin-bottom: 10px;" align="center" id="o-auth">
+    <div align="center" id="o-auth" class="csp-auth-actions">
         
-        <a href="/register" class="btn btn-primary" style="margin-left:7px; background: #2aa2b8;">Register</a>
+        <a href="/register" class="btn btn-primary csp-auth-button">Register</a>
 
         <form method="post" action="/accounts/google/login/">
              {% csrf_token %} 
-            <button type="submit" class="btn btn-primary" style="margin-left:7px; background: #2aa2b8;">
+            <button type="submit" class="btn btn-primary csp-auth-button">
                 Login with Google
             </button>
         </form>

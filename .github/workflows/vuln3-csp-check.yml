@@ -1,0 +1,96 @@
+name: Vulnerability 3 - CSP before and after
+
+on:
+  push:
+    branches: [vuln3-csp]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  csp_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out baseline code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          path: before
+
+      - name: Check out patched code
+        uses: actions/checkout@v4
+        with:
+          path: after
+
+      - name: Build both images from this repository
+        run: |
+          docker build -t ncs-pygoat:before before
+          docker build -t ncs-pygoat:after after
+
+      - name: Compare response headers and ZAP findings
+        run: |
+          mkdir -p reports
+          chmod 777 reports
+          docker network create ncs-csp-check
+
+          for MODE in before after; do
+            docker run --rm -d \
+              --name ncs-pygoat-csp \
+              --network ncs-csp-check \
+              --network-alias web \
+              -p 127.0.0.1:18000:8000 \
+              -e DJANGO_SECRET_KEY=ci-only-csp-check-key-123456789 \
+              "ncs-pygoat:$MODE" \
+              sh -c 'python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 pygoat.wsgi'
+
+            READY=0
+            for i in $(seq 1 60); do
+              if curl -fsS -o /dev/null http://127.0.0.1:18000/login/; then
+                READY=1
+                break
+              fi
+              sleep 2
+            done
+            test "$READY" -eq 1
+
+            curl -fsS -D "reports/$MODE-headers.txt" -o /dev/null \
+              http://127.0.0.1:18000/login/
+            docker run --rm \
+              --network ncs-csp-check \
+              -v "$PWD/reports:/zap/wrk:rw" \
+              ghcr.io/zaproxy/zaproxy:stable \
+              zap-baseline.py -t http://web:8000 -r "$MODE-zap.html" -I \
+              > "reports/$MODE-zap.log" 2>&1
+
+            docker stop ncs-pygoat-csp
+          done
+
+          echo '## CSP before and after' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Build | ZAP result for missing CSP |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          for MODE in before after; do
+            RESULT=$(grep -m1 'Content Security Policy (CSP) Header Not Set' \
+              "reports/$MODE-zap.log" || true)
+            echo "| $MODE | $RESULT |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          grep -q 'WARN-NEW: Content Security Policy (CSP) Header Not Set' \
+            reports/before-zap.log
+          grep -q 'PASS: Content Security Policy (CSP) Header Not Set' \
+            reports/after-zap.log
+          grep -q 'PASS: CSP \[10055\]' reports/after-zap.log
+          if grep -q 'WARN-NEW: CSP:' reports/after-zap.log; then
+            echo 'ZAP found a new CSP policy warning after the patch' >&2
+            exit 1
+          fi
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '### CSP policy check' >> "$GITHUB_STEP_SUMMARY"
+          grep 'PASS: CSP \[10055\]' reports/after-zap.log \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload comparison reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vuln3-csp-comparison
+          path: reports/
